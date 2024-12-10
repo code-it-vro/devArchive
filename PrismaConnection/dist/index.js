@@ -13,14 +13,18 @@ const client_1 = require("@prisma/client");
 const client = new client_1.PrismaClient();
 function createUser() {
     return __awaiter(this, void 0, void 0, function* () {
+        // Create a user
         yield client.user.create({
             data: {
-                username: "ashutosh123456",
+                username: "ashutosh123",
                 password: "password123",
                 age: 30,
             },
         });
         console.log("User created successfully");
+        // Fetch all users from the table
+        const users = yield client.user.findMany(); // Queries the entire 'user' table
+        console.log("Users in the table:", users);
     });
 }
 createUser();
