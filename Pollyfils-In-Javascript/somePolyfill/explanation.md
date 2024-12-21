@@ -28,13 +28,11 @@
 Added to Array.prototype to make it available for all arrays
 Takes two parameters: callback and thisContext
 
-
 - **Input Validation:**
 
 Checks if callback is a function
 Throws error if invalid type is provided
 Ensures method safety and reliability
-
 
 - **Array Reference:**
 
@@ -42,20 +40,17 @@ Stores this in array variable
 Makes code more readable and maintainable
 Provides consistent reference throughout the function
 
-
 - **Iteration Process:**
 
 Uses standard for loop to traverse array
 Checks each element sequentially
 Allows for early termination when match is found
 
-
 - **Sparse Array Handling:**
 
 Uses `hasOwnProperty` check
 Skips holes in sparse arrays
 Maintains consistent behavior with native implementation
-
 
 - **Callback Execution:**
 
@@ -65,7 +60,6 @@ Passes three arguments:
 Current element (array[i])
 Current index (i)
 Original array (array)
-
 
 - **Return Logic:**
 
