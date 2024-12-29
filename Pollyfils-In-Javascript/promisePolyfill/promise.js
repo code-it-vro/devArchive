@@ -25,7 +25,6 @@ function MyPromise(executor) {
     // Process any queued handlers
     handlers.forEach(handle);
   }
-
   /**
    * Rejects the promise with an error
    * @param {*} error The error to reject with
@@ -39,7 +38,6 @@ function MyPromise(executor) {
     // Process any queued handlers
     handlers.forEach(handle);
   }
-
   /**
    * Handles resolution/rejection with appropriate callbacks
    * @param {Object} handler Contains onFulfilled/onRejected callbacks
@@ -56,7 +54,6 @@ function MyPromise(executor) {
       handlers.push(handler);
     }
   }
-
   /**
    * Chains promises and transforms values
    * @param {Function} onFulfilled Success callback
