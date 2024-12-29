@@ -3,22 +3,28 @@ Promise.myAll = function (promises) {
     if (!Array.isArray(promises)) {
       return reject(new TypeError("promises must be an array"));
     }
+
     const n = promises.length;
     const results = [];
+    let completedCount = 0;
+
     if (n === 0) {
       return resolve(results);
     }
-    promises.forEach(async (promise, index) => {
-      try {
-        const res = await promise;
-        results[index] = res;
-        if ((index === n - 1)) {
-          resolve(results);
-          return;
-        }
-      } catch (error) {
-        reject(error);
-      }
+
+    promises.forEach((promise, index) => {
+      Promise.resolve(promise)
+        .then((res) => {
+          results[index] = res; // Preserve order
+          completedCount++;
+
+          if (completedCount === n) {
+            resolve(results); // Resolve only when all promises are fulfilled
+          }
+        })
+        .catch((error) => {
+          reject(error); // Reject immediately if any promise fails
+        });
     });
   });
 };
