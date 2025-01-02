@@ -9,8 +9,8 @@ export async function POST(req: NextRequest) {
 
     await prismaClient.user.create({
       data: {
-        name: data.name,
-        password: data.password
+        username: data.username,
+        password: data.password,
       },
     });
 
