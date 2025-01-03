@@ -1,36 +1,160 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
 
-First, run the development server:
+# **Latest Next.js Full-Stack Application**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This project demonstrates how to bootstrap a bare minimum full-stack application in Next.js using **Prisma**, **TypeScript**, and **PostgreSQL**. Below is a step-by-step guide to setting up the application.
+
+---
+
+## **1. Bootstrapping the Project**
+1. Run the following command to create a new Next.js application:
+   ```bash
+   npx create-next-app@latest
+   ```
+2. During setup, choose the following options:
+   - **TypeScript**: Yes
+   - **ESLint**: Yes
+   - **App Router**: Yes
+   - **Tailwind CSS**: Yes
+   - **Experimental Features**: No
+
+3. Navigate to the newly created project folder:
+   ```bash
+   cd latest-nextjs
+   ```
+
+---
+
+## **2. Setting Up the Backend**
+
+### **API Route**
+The backend logic is defined in the `api/v1/signup/route.ts` file. This route handles user sign-ups by saving data to a PostgreSQL database.
+
+### **File: `app/api/v1/signup/route.ts`**
+```typescript
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+
+const prismaClient = new PrismaClient();
+
+export async function POST(req: NextRequest) {
+  try {
+    const data = await req.json();
+
+    // Save user data to the database
+    await prismaClient.user.create({
+      data: {
+        name: data.username,
+        password: data.password,
+      },
+    });
+
+    console.log("Received data:", data);
+
+    return NextResponse.json({
+      message: "You have been signed up",
+    });
+  } catch (error) {
+    console.error("Error processing request:", error);
+    return NextResponse.json({ message: "An error occurred" }, { status: 500 });
+  }
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## **3. Setting Up the Database**
+1. **Install Prisma**:
+   ```bash
+   npm install prisma --save-dev
+   npm install @prisma/client
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Initialize Prisma**:
+   ```bash
+   npx prisma init
+   ```
 
-## Learn More
+3. **Prisma Schema**:
+   Update your `prisma/schema.prisma` file to define the `User` model:
+   ```prisma
+   generator client {
+     provider = "prisma-client-js"
+   }
 
-To learn more about Next.js, take a look at the following resources:
+   datasource db {
+     provider = "postgresql"
+     url      = env("DATABASE_URL")
+   }
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   model User {
+     id       Int    @id @default(autoincrement())
+     name     String
+     password String
+   }
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Run Migrations**:
+   ```bash
+   npx prisma migrate dev --name init
+   ```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## **4. Setting Up the Frontend**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### **Sign-Up Page**
+The frontend for user sign-up is located in `signup/page.tsx`. It uses `axios` to send a `POST` request to the backend.
+
+### **File: `signup/page.tsx`**
+```tsx
+"use client";
+
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+export default function Signup() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  return (
+    <div>
+      <h1>Sign Up</h1>
+      <div>
+        <input
+          type="text"
+          placeholder="Username"
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button
+          onClick={async () => {
+            await axios.post("/api/v1/signup", { username, password });
+            router.push("/signin");
+          }}
+        >
+          Sign Up
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## **5. Running the Application**
+1. Start the development server:
+   ```bash
+   npm run dev
+   ```
+2. Access the application in your browser at `http://localhost:3000`.
+
+---
+
