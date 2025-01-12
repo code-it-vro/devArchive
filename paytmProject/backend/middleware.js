@@ -9,9 +9,13 @@ const authMiddleware = async (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decode = jwt.verify(token, JWT_SECRET);
-    req.userId = decode.userId;
-    next();
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.userId) {
+      req.userId = decoded.userId;
+      next();
+    } else {
+      return res.status(403).json({});
+    }
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized" });
   }

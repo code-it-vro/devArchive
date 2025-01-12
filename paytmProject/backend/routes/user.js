@@ -2,8 +2,8 @@ const express = require("express");
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const User = require("../models/User"); // Adjust path as needed
-const JWT_SECRET = require("../config").JWT_SECRET; // Adjust import as needed
+const User = require("../models/User"); 
+const JWT_SECRET = require("../config").JWT_SECRET; 
 
 const router = express.Router();
 
