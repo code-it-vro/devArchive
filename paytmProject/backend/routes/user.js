@@ -2,7 +2,7 @@ const express = require("express");
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const User = require("../models/User");
+const { User } = require("../db");
 const JWT_SECRET = require("../config").JWT_SECRET;
 const authMiddleware = require("../middleware"); 
 
