@@ -110,3 +110,156 @@ my-turborepo/
 - Turborepo ensures that:
     - Shared packages are built before apps using them.
     - Changes are cached intelligently, so only what's necessary is rebuilt.
+
+&nbsp;
+
+&nbsp;
+
+# Everything in `turbo.json`
+
+The `turbo.json` file is the configuration for Turborepo, and it controls how tasks are executed, cached, and orchestrated in the monorepo.
+
+---
+
+### **File Structure Explained**
+
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
+```
+
+---
+
+### **1. `$schema`**
+
+```json
+"$schema": "https://turbo.build/schema.json"
+```
+
+- This defines the JSON schema for Turborepo’s configuration.
+- It provides validation and autocompletion support in code editors like VS Code.
+
+---
+
+### **2. `ui`**
+
+```json
+"ui": "tui"m
+```
+
+- Specifies the **user interface mode** when you run Turborepo commands.
+- `"tui"`: Enables the **terminal user interface** (fancy terminal display) for better visualization of tasks and their status.
+
+---
+
+### **3. `tasks`**
+
+This section defines the **tasks** that Turborepo will manage, how they depend on each other, and their caching behavior.
+
+### **a. `build` Task**
+
+```json
+"build": {
+  "dependsOn": ["^build"],
+  "inputs": ["$TURBO_DEFAULT$", ".env*"],
+  "outputs": [".next/**", "!.next/cache/**"]
+}
+```
+
+- **`dependsOn`**:
+    - `["^build"]` means this task depends on the `build` task in **all dependencies**.
+    - The `^` signifies **dependency relationships** in the monorepo. For example:
+        - If `app1` depends on `lib1`, running `build` in `app1` will also trigger `build` in `lib1`.basicaly it see’s any directed graph or dependecy is present if yes then first build the module on which the other module is dependent like we are exporting anything from .env and using it should first build .env then the other module
+- **`inputs`**:
+    - Defines the **files** and **environment variables** that determine if the task needs to be re-run. **(In simple language ,If anything changes in root or in pacakage.json or on in .env then again start the build process )**
+    - `$TURBO_DEFAULT$`: Refers to the default set of tracked inputs (like `package.json`, source files).
+    - `.env*`: Includes `.env` files and others like `.env.local`.
+- **`outputs`**:
+    - Defines what gets cached as the output of the task.
+    - `".next/**"`: Includes everything in the `.next` folder (e.g., Next.js build artifacts).[this where the build of the next js app is created i.e in `.next` folder so anyhing in it need to be cached but  `.next/cache` this folder need not to be cached as it itself has caching of .next folder ]
+    - `"!.next/cache/**"`: Excludes the `.next/cache` folder from caching.
+
+---
+
+### **b. `lint` Task**
+
+```json
+"lint": {
+  "dependsOn": ["^lint"]
+}
+```
+
+- **`dependsOn`**:
+    - `["^lint"]` ensures that linting is executed for dependencies before running in the current package.
+    - Example: If `app1` depends on `lib1`, `lib1`’s linting will run first.
+
+---
+
+### **c. `check-types` Task**
+
+```json
+"check-types": {
+  "dependsOn": ["^check-types"]
+}
+```
+
+- Works similarly to `lint`.
+- Ensures type-checking (`check-types`) is performed for dependencies before the current package.
+
+---
+
+### **d. `dev` Task**
+
+```json
+"dev": {
+  "cache": false,
+  "persistent": true
+}
+
+```
+
+- **`cache: false`**:
+    - Disables caching for this task.
+    - Dev tasks are typically for local development, so caching is unnecessary.
+- **`persistent: true`**:
+    - Keeps the task running in the background (e.g., starting a dev server).
+    - Useful for watch mode, hot reloading, or long-running processes.
+
+---
+
+### **Key Takeaways**
+
+1. **Dependency Awareness**:
+    
+    Tasks like `build`, `lint`, and `check-types` automatically account for dependencies.
+    
+    Turborepo runs them in the correct order based on the dependency graph.
+    
+2. **Caching**:
+    
+    Tasks cache their outputs intelligently to avoid redundant work.
+    
+    Example: The `build` task caches `.next/**` but excludes `.next/cache/**`.
+    
+3. **Dev Experience**:
+    
+    The `dev` task is tailored for development workflows, focusing on persistence and bypassing caching.
